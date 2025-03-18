@@ -1,0 +1,6 @@
+__pycache__/
+.venv
+.env
+.idea
+backend/tmdb_main.py
+*.tar
