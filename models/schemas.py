@@ -11,7 +11,7 @@ class Razvorot1(BaseModel):
 
 class Razvorot2(BaseModel):
     scenery: str
-    action: str
+    positive_reaction: str
 
 
 class Razvorot3(BaseModel):
