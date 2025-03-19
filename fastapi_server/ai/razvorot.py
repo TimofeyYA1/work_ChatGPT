@@ -22,23 +22,16 @@ async def negative_scenario(data: Razvorot1):
         db = DatabaseAdapter()
         db.connect()
         db.initialize_tables()
+        try:
+            db.delete("reverse",data.id)
+        except:
+            pass
         db.insert("reverse",{"id":data.id,"who":data.who,"quality":data.quality,"what_was_he_doing":data.what_was_he_doing,"reaction":data.reaction})
     return {"result": title}
 
 
 
-# {
-#   "data0": {
-#     "who": "Федя",
-#     "quality": "Назойливый",
-#     "what_was_he_doing": "Все время пристает",
-#     "reaction": "Меня это выводит из себя"
-#   },
-#   "data": {
-#     "acceptance": "Дорогой Федя! Я принимаю тебя таким, какой ты есть",
-#     "thank": "Спасибо тебе за возможность мне улучшить себя и стать добрее"
-#   }
-# }
+
 @router.post("/razvorot/2")
 async def b_scenario(data: Razvorot2):
     db = DatabaseAdapter()
@@ -47,7 +40,8 @@ async def b_scenario(data: Razvorot2):
     data0 = db.get_by_id("reverse",data.id)
     if len(data0)>0:
         data0 = data0[0]
-    print(data)
+    else:
+        raise HTTPException(status_code=403, detail="Походу вы еще не прошли первый шаг анкеты")
     data0 =  Razvorot1(**data0)
     response = client.chat.completions.create(
         model="gpt-4o",
@@ -59,7 +53,7 @@ async def b_scenario(data: Razvorot2):
     title = response.choices[0].message.content
     return {"result": title}
   
-  
+
 @router.post("/razvorot/3")
 async def b_scenario(data0:Razvorot1,data: Razvorot3):
     db = DatabaseAdapter()
@@ -68,7 +62,8 @@ async def b_scenario(data0:Razvorot1,data: Razvorot3):
     data0 = db.get_by_id("reverse",data.id)
     if len(data0)>0:
         data0 = data0[0]
-    print(data)
+    else:
+        raise HTTPException(status_code=403, detail="Походу вы еще не прошли первый шаг анкеты")
     data0 =  Razvorot1(**data0)
     response = client.chat.completions.create(
         model="gpt-4o",
