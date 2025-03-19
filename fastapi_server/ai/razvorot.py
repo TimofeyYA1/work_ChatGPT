@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Security, UploadFile
 from g4f import Client
 from fastapi.security import HTTPBearer
 from models.schemas import Razvorot1,Razvorot2,Razvorot3
-
+from adapters.db_source import DatabaseAdapter
 
 router = APIRouter()
 Bear = HTTPBearer(auto_error=False)
@@ -18,6 +18,11 @@ async def negative_scenario(data: Razvorot1):
            timeout=100
     )
     title = response.choices[0].message.content
+    if "Да" in title:
+        db = DatabaseAdapter()
+        db.connect()
+        db.initialize_tables()
+        db.insert("reverse",{"id":data.id,"who":data.who,"quality":data.quality,"what_was_he_doing":data.what_was_he_doing,"reaction":data.reaction})
     return {"result": title}
 
 
@@ -35,7 +40,15 @@ async def negative_scenario(data: Razvorot1):
 #   }
 # }
 @router.post("/razvorot/2")
-async def b_scenario(data0:Razvorot1,data: Razvorot2):
+async def b_scenario(data: Razvorot2):
+    db = DatabaseAdapter()
+    db.connect()
+    db.initialize_tables()
+    data0 = db.get_by_id("reverse",data.id)
+    if len(data0)>0:
+        data0 = data0[0]
+    print(data)
+    data0 =  Razvorot1(**data0)
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "user",
@@ -46,8 +59,17 @@ async def b_scenario(data0:Razvorot1,data: Razvorot2):
     title = response.choices[0].message.content
     return {"result": title}
   
+  
 @router.post("/razvorot/3")
 async def b_scenario(data0:Razvorot1,data: Razvorot3):
+    db = DatabaseAdapter()
+    db.connect()
+    db.initialize_tables()
+    data0 = db.get_by_id("reverse",data.id)
+    if len(data0)>0:
+        data0 = data0[0]
+    print(data)
+    data0 =  Razvorot1(**data0)
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "user",
