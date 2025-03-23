@@ -5,8 +5,6 @@ import uvicorn
 from fastapi_server.ai import router as ai_router
 from fastapi import FastAPI
 import os
-import time
-import bcrypt
 load_dotenv()
 '''def load_custom_openapi(): 
     with open("backend/openapi(1).json", "r") as file:

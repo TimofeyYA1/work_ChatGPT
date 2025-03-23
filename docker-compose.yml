@@ -17,7 +17,7 @@ services:
   app_api:
     image: backend:master
     build:
-      context: 
+      context: .
       dockerfile: Dockerfile
     container_name: backend_container
     environment:

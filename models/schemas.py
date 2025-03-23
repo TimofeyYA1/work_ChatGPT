@@ -1,6 +1,3 @@
-from datetime import datetime
-
-from pycparser.c_ast import Struct
 from pydantic import BaseModel
 
 class Razvorot1(BaseModel):
