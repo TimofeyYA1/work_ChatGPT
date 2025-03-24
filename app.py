@@ -21,10 +21,12 @@ app.add_middleware(
     allow_methods=["*"],    
     allow_headers=["*"],
 )
-app.include_router(ai_router, prefix="/api/ai", tags=["AI"])
+app.include_router(ai_router, prefix="/ai", tags=["AI"])
 
-
+@app.post("/ping")
+async def negative_scenario():
+    return {"status":"workkkkkk"}
 if __name__ == "__main__":
     host, port = os.getenv("FAST_API_HOST"), os.getenv("FAST_API_PORT")
-    uvicorn.run(app, host=host, port=int(port))
+    uvicorn.run(app,host=host,port=int(port),http="httptools")
     

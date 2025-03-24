@@ -13,10 +13,10 @@ class DatabaseAdapter:
     def connect(self) -> None:
         try:
             self.connection = psycopg2.connect(
-                dbname="postgres",
+                dbname=os.getenv("DBNAME"),
                 user="postgres",
                 password=os.getenv("DB_PASSWORD"),
-                host=os.getenv("DB_HOST"),
+                host=os.getenv("DB_HOST"),  
                 port=os.getenv("DB_PORT")
             )
             print("Соединение с базой данных установлено.")

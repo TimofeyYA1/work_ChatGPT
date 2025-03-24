@@ -15,12 +15,9 @@ services:
     restart: unless-stopped
 
   app_api:
-    image: backend:master
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: my_image
     container_name: backend_container
-    environment:
+    environment:  
       FAST_API_HOST: ${FAST_API_HOST}
       FAST_API_PORT: ${FAST_API_PORT}
       DBNAME: ${DBNAME}
