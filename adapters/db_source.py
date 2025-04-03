@@ -26,21 +26,30 @@ class DatabaseAdapter:
     def initialize_tables(self) -> None:
         table_definitions = {
             "reverse": """
-                CREATE TABLE IF NOT EXISTS reverse (
-                    id VARCHAR(200),
+                CREATE TABLE IF NOT EXISTS reverse  (
+                    id VARCHAR(200) PRIMARY KEY,
                     who VARCHAR(1000),
-                    quality VARCHAR(1000)  ,
+                    quality VARCHAR(1000),
                     what_was_he_doing VARCHAR(1000),
                     reaction VARCHAR(1000)
                 );
             """
         }
-
         with self.connection.cursor() as cursor:
             for table_name, create_query in table_definitions.items():
                 cursor.execute(create_query)
                 print(f"Таблица '{table_name}' проверена или создана.")
             self.connection.commit()
+
+        # with self.connection.cursor() as cursor:
+        #     for table_name, full_sql in table_definitions.items():
+        #         # Разделим на отдельные команды, если в одном блоке DROP + CREATE
+        #         for statement in full_sql.strip().split(";"):
+        #             if statement.strip():
+        #                 cursor.execute(statement.strip() + ";")
+        #         print(f"Таблица '{table_name}' пересоздана.")
+        #     self.connection.commit()
+
     def get_all(self, table_name: str) -> List[dict]:
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(f"SELECT * FROM {table_name};")
@@ -50,6 +59,20 @@ class DatabaseAdapter:
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(f"SELECT * FROM {table_name} WHERE id = %s;", (id,))
             return cursor.fetchall()
+        
+    def insert_or_update(self, table: str, data: dict):
+        keys = ', '.join(data.keys())
+        values = ', '.join(['%s'] * len(data))
+        updates = ', '.join([f"{k}=EXCLUDED.{k}" for k in data if k != "id"])
+
+        sql = f"""
+        INSERT INTO {table} ({keys}) VALUES ({values})
+        ON CONFLICT (id) DO UPDATE SET {updates};
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(sql, tuple(data.values()))
+            self.connection.commit()
 
     def get_by_value(
         self,
